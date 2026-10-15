@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Check Quiz – LSC 1503</title>
+<style>
+:root{--a:#2547A8;--a2:#3A63D1;--b:#F6C445;--bl:#FFF6D9;--bg:#EEF2FB;--ink:#1F2433;--muted:#667085;--ok:#2E9E5B;--bad:#D64545}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55;min-height:100vh}
+header{background:linear-gradient(135deg,var(--a),var(--a2));color:#fff;text-align:center;padding:22px 16px;border-bottom:6px solid var(--b)}
+header h1{font-size:1.8rem}
+main{max-width:760px;margin:0 auto;padding:20px 16px 50px}
+.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.08);margin-bottom:16px}
+h2{color:var(--a);margin-bottom:8px}
+.btn{border:none;border-radius:10px;padding:11px 20px;font-weight:700;cursor:pointer;font-size:1rem}
+.btn-a{background:var(--a);color:#fff}.btn-b{background:var(--b);color:var(--ink)}.btn-g{background:#fff;color:var(--a);border:2px solid var(--a)}
+input[type=text]{width:100%;max-width:380px;border:2px solid #DDD;border-radius:10px;padding:10px 12px;font-size:1rem}
+.bar{height:10px;background:#E8E8EE;border-radius:99px;overflow:hidden;margin:6px 0 14px}.bar div{height:100%;background:var(--b);transition:width .3s}
+.top{display:flex;justify-content:space-between;font-weight:700;color:var(--muted);font-size:.9rem}
+.q{font-size:1.15rem;font-weight:700;margin-bottom:14px}
+.opt{display:block;width:100%;text-align:left;border:2px solid #E3E3EA;background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:9px;font-size:1rem;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--a)}
+.opt.right{border-color:var(--ok);background:#EAF7EF}.opt.wrong{border-color:var(--bad);background:#FCECEC}
+.hint{background:var(--bl);border:2px dashed var(--b);border-radius:10px;padding:10px 12px;margin:8px 0;display:none}
+.hint.show{display:block}.hint .ar{direction:rtl;font-weight:700;font-size:1.1rem;color:var(--a)}
+.exp{margin-top:10px;padding:10px 14px;border-radius:10px;font-weight:600;display:none}.exp.show{display:block}
+.exp.good{background:#EAF7EF;color:#1E6B3E}.exp.bad{background:#FCECEC;color:#8A2525}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.big{font-size:3rem;font-weight:800;color:var(--a);text-align:center}
+.rv{border-left:5px solid var(--ok);padding:8px 12px;margin:8px 0;background:#FAFAFC;border-radius:8px}.rv.x{border-color:var(--bad)}
+.cert{border:8px double var(--a);border-radius:18px;padding:28px;text-align:center;background:linear-gradient(135deg,#fff,var(--bl))}
+.cert .name{font-size:1.7rem;font-weight:800;color:var(--a);border-bottom:2px solid var(--b);display:inline-block;padding:0 18px;margin:8px 0}
+footer{text-align:center;color:var(--muted);font-size:.85rem;padding:16px}
+#cf{position:fixed;inset:0;pointer-events:none}
+@media print{header,footer,.no-print{display:none!important}body{background:#fff}}
+</style>
+</head>
+<body>
+<canvas id="cf"></canvas>
+<header><h1>📝 Script Check Quiz</h1><p>LSC 1503 · Communication Skills Portfolio · Lesson 2 quiz</p></header>
+<main id="app"></main>
+<footer>Designed by: Nazila Motahari · LSC 1503</footer>
+<script>
+const QS=[{"q": "Why should you write a full script before you record?", "o": ["To plan every part and choose your words", "To read it word for word to the camera", "So the teacher can mark it instead of the video", "So your video can be ten minutes long"], "e": "A script helps you plan, but you do not read it word for word.", "h": ["script", "نص مكتوب"]}, {"q": "In the video, what does it mean to “glance” at your notes?", "o": ["Look quickly, then look back up", "Read the whole page slowly", "Close your eyes and remember", "Hold the paper in front of your face"], "e": "A glance is a very quick look. Then you look at the camera again.", "h": ["glance", "نظرة سريعة"]}, {"q": "Which sentence sounds like SPOKEN style?", "o": ["So, why did I choose this LPA?", "This report examines the selected LPA.", "The LPA was selected for analysis.", "Selection of the LPA was deliberate."], "e": "Spoken style is short, simple and talks to the viewer.", "h": ["spoken style", "أسلوب المحادثة"]}, {"q": "We speak about 110 words per minute. About how many words is a 4-minute script?", "o": ["About 440 words", "About 110 words", "About 1,000 words", "About 4,000 words"], "e": "4 minutes × 110 words = about 440 words.", "h": ["word count", "عدد الكلمات"]}, {"q": "Which is the best cue card?", "o": ["learned → prepare questions → confident", "LPA", "Everything I want to say in this part", "From this activity, I learned that preparing questions before an interview makes me feel confident."], "e": "A cue card has only key words that remind you of each idea.", "h": ["cue card", "بطاقة تذكير"]}, {"q": "Which sentence is signposting?", "o": ["Now, let's move on to my study skill.", "My study skill helped me a lot this term.", "I practised mind mapping every single week.", "Mind mapping means drawing ideas on paper."], "e": "Signposting tells the viewer you are moving to the next part.", "h": ["signposting", "عبارات انتقالية"]}, {"q": "Your script has 700 words. What should you do?", "o": ["Cut some ideas so you stay under 5 minutes", "Speak very fast so everything fits in", "Keep it all because longer is always better", "Delete your introduction and conclusion"], "e": "700 words is over 6 minutes. Cut ideas to stay within 3–5 minutes.", "h": ["concise", "موجز"]}, {"q": "Which use of AI is NOT allowed (Red)?", "o": ["Asking AI to write your whole script", "Asking AI to check the grammar of your notes", "Searching online to learn about a study skill", "Making an AI image for a title slide, with a reference"], "e": "AI must not write your script. Your words must be your own.", "h": ["own words", "بأسلوبك الخاص"]}, {"q": "Where should you put your cue cards when you record?", "o": ["Next to the camera", "On your lap under the desk", "On the wall behind you", "In your bag until you finish"], "e": "Next to the camera, so a glance is short and your eyes stay near the lens.", "h": ["eye contact", "التواصل البصري"]}, {"q": "Which part comes straight after the LPA reflection?", "o": ["Study skill reflection", "Introduction + ID card", "Conclusion", "Title slide"], "e": "The order is: Introduction → LPA → Study skill → Improvement → Conclusion.", "h": ["order", "ترتيب"]}, {"q": "“This is important because my classmates cannot hear me.” Which step is this?", "o": ["So What?", "What?", "Now What?", "Conclusion"], "e": "SO WHAT? explains why the problem matters.", "h": ["So What? = why is it important?", "لماذا هذا مهم؟"]}, {"q": "Why should you keep your script and drafts after recording?", "o": ["As evidence of your own work", "To read them aloud in the final video", "To give them to classmates to copy", "Because the video needs subtitles"], "e": "Your teacher may ask for proof that the work is your own.", "h": ["evidence", "دليل"]}];
+let name="",order=[],cur=0,score=0,pts=0,answers=[],hintUsed=false;
+const app=document.getElementById("app");
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+function start(){
+  app.innerHTML=`<div class="card"><h2>Script Check Quiz</h2><p>${QS.length} questions about scripts, cue cards and spoken style. You need <b>80%</b> for your certificate.</p>
+  <p style="margin-top:8px;color:var(--muted)">💡 Stuck? Use a hint (Arabic support). A correct answer = 10 points, or 7 points with a hint.</p>
+  <div class="row"><input type="text" id="nm" placeholder="Type your full name"><button class="btn btn-a" onclick="begin()">Start ➜</button></div></div>`;
+}
+function begin(){const v=document.getElementById("nm").value.trim();if(!v){alert("Please type your name");return}name=v;
+  order=shuf(QS.map((q,i)=>({...q,opts:shuf(q.o.map((t,k)=>({t,ok:k===0})))})));cur=0;score=0;pts=0;answers=[];show()}
+function show(){
+  const q=order[cur];hintUsed=false;
+  app.innerHTML=`<div class="card"><div class="top"><span>Question ${cur+1} / ${order.length}</span><span>⭐ ${pts} pts</span></div>
+  <div class="bar"><div style="width:${cur/order.length*100}%"></div></div>
+  <div class="q">${esc(q.q)}</div>
+  ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${esc(o.t)}</button>`).join("")}
+  <div class="hint" id="hint">🔑 <b>${esc(q.h[0])}</b> — <span class="ar">${esc(q.h[1])}</span></div>
+  <div class="exp" id="exp"></div>
+  <div class="row"><button class="btn btn-b" id="hb" onclick="hint()">💡 Hint (−3)</button><button class="btn btn-a" id="nx" style="display:none" onclick="next()">Next ➜</button></div></div>`;
+}
+function hint(){hintUsed=true;document.getElementById("hint").classList.add("show");document.getElementById("hb").disabled=true}
+function pick(i){
+  const q=order[cur],bs=[...document.querySelectorAll(".opt")];bs.forEach(b=>b.disabled=true);
+  const ok=q.opts[i].ok;q.opts.forEach((o,k)=>{if(o.ok)bs[k].classList.add("right")});if(!ok)bs[i].classList.add("wrong");
+  if(ok){score++;pts+=hintUsed?7:10}
+  answers.push({q:q.q,your:q.opts[i].t,right:q.o[0],ok});
+  const e=document.getElementById("exp");e.className="exp show "+(ok?"good":"bad");e.textContent=(ok?"✓ Correct! ":"✗ Not quite. ")+q.e;
+  document.getElementById("hb").style.display="none";document.getElementById("nx").style.display="inline-block";
+}
+function next(){cur++;cur<order.length?show():end()}
+function end(){
+  const pct=Math.round(score/order.length*100),pass=pct>=80;
+  app.innerHTML=`<div class="card"><h2>${pass?"🎉 Well done!":"Good effort!"}</h2><div class="big">${pct}%</div>
+  <p style="text-align:center">${score} / ${order.length} correct · ${pts} points</p>
+  ${pass?"":`<p style="text-align:center;margin-top:8px">You need 80% for the certificate. Review your answers and try again!</p>`}
+  <div class="row no-print" style="justify-content:center">${pass?`<button class="btn btn-a" onclick="cert()">🏆 My certificate</button>`:""}<button class="btn btn-b" onclick="begin()">↺ Try again</button><button class="btn btn-g" onclick="saveRes(${pct})">💾 Save result</button></div></div>
+  <div class="card"><h2>Review</h2>${answers.map((a,i)=>`<div class="rv ${a.ok?"":"x"}"><b>${i+1}. ${esc(a.q)}</b><br>Your answer: ${esc(a.your)}${a.ok?" ✓":`<br>Correct: <b>${esc(a.right)}</b>`}</div>`).join("")}</div>`;
+  if(pass)cf();
+}
+function cert(){
+  const pct=Math.round(score/order.length*100);
+  app.innerHTML=`<div class="cert"><div style="font-size:3rem">🏆</div><h2>Certificate of Achievement</h2><p>This certifies that</p><div class="name">${esc(name)}</div>
+  <p>passed the <b>Script Check Quiz</b> with <b>${pct}%</b> (${pts} points).</p><p style="margin-top:6px">${new Date().toLocaleDateString("en-GB")}</p>
+  <p style="margin-top:12px;color:var(--muted);font-size:.85rem">Designed by: Nazila Motahari · LSC 1503</p></div>
+  <div class="row no-print" style="justify-content:center"><button class="btn btn-a" onclick="window.print()">🖨️ Print / PDF</button><button class="btn btn-g" onclick="end()">Back</button></div>`;cf();
+}
+function saveRes(pct){const d={quiz:"Script Check Quiz",name,score,total:order.length,percent:pct,points:pts,date:new Date().toISOString(),answers};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(d,null,2)],{type:"application/json"}));a.download=`ScriptCheck_${name.replace(/\s+/g,"_")}.json`;a.click()}
+function cf(){const c=document.getElementById("cf"),x=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;const cols=["#2547A8","#F6C445","#fff","#3A63D1"];
+  const P=Array.from({length:120},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,r:4+Math.random()*5,c:cols[Math.random()*4|0],v:2+Math.random()*3,s:Math.random()*6}));let f=0;
+  (function d(){x.clearRect(0,0,c.width,c.height);P.forEach(p=>{p.y+=p.v;p.x+=Math.sin((f+p.s)/10);x.fillStyle=p.c;x.fillRect(p.x,p.y,p.r,p.r*1.6)});if(++f<160)requestAnimationFrame(d);else x.clearRect(0,0,c.width,c.height)})()}
+start();
+</script>
+</body>
+</html>
